@@ -1,0 +1,52 @@
+name: Deploy Cloud-Claw to Cloudflare
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: 'Reason for manual deployment'
+        required: false
+        default: 'Manual trigger'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    name: Deploy to Cloudflare Workers
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: '10'
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Create .env file
+        run: |
+          cat > .env << 'EOF'
+          SERVER_USERNAME=admin
+          SERVER_PASSWORD=cloud-claw-2026
+          WORKER_URL=https://cloud-claw.maoyuan-wen-683.workers.dev
+          OPENCLAW_GATEWAY_TOKEN=oc_ab414fc7c8d4e1b5aee4fb0348f53bfd
+          S3_ENDPOINT=https://683392e016d0a9c5446a8c648da62ce6.r2.cloudflarestorage.com
+          S3_BUCKET=openclaw-storage
+          S3_PREFIX=cloud-claw
+          EOF
+
+      - name: Deploy to Cloudflare Workers
+        run: npx wrangler deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

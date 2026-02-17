@@ -2,6 +2,7 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "cloud-claw",
   "main": "./src/index.ts",
+  "account_id": "683392e016d0a9c5446a8c648da62ce6",
   "compatibility_date": "2026-01-01",
   "compatibility_flags": ["nodejs_compat"],
   "minify": true,
